@@ -15,6 +15,15 @@ class ApiClient extends Client {
 	public $user;
 	public $rawToken;
 	public $token;
+	public static $client;
+
+	public static function getClient() {
+		return self::$client;
+	}
+
+	public static function setClient($client) {
+		self::$client = $client;
+	}
 
 	public function __construct($username, $password) {
 
@@ -60,6 +69,8 @@ class ApiClient extends Client {
 		$this->user = array();
 		$this->rawToken = array();
 		$this->token = null;
+
+		self::$client = $this;
 	}
 
 	public function login($username, $password) {
