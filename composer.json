@@ -1,0 +1,20 @@
+{
+    "name": "kammi/php-kammi-client",
+    "description": "PHP Kammi API Client",
+    "license": "proprietary",
+    "require": {
+        "guzzlehttp/guzzle": "^6.3",
+        "eljam/guzzle-jwt-middleware": "^0.5.0"
+    },
+    "authors": [
+        {
+            "name": "Damien Parbhakar",
+            "email": "damien.parbhakar@kemeo.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "KammiApiClient\\": "src/"
+        }
+    }
+}
