@@ -10,11 +10,9 @@ use Eljam\GuzzleJwt\JwtMiddleware;
 use Eljam\GuzzleJwt\Manager\JwtManager;
 use Eljam\GuzzleJwt\Strategy\Auth\JsonAuthStrategy;
 
-class ApiClient extends Client {
+class ApiClientFactory {
 
-	public $user;
-	public $rawToken;
-	public $token;
+	public static $env;
 	public static $client;
 
 	public static function getClient() {
@@ -25,8 +23,48 @@ class ApiClient extends Client {
 		self::$client = $client;
 	}
 
-	public function __construct($username, $password) {
+	public static function init($opt = null) {
+		if($opt == null) {
+			self::$env['host'] = 'https://api-dev.zephir.pro';
+		} else {
+			self::$env['host'] = $opt['host'];
+		}
+		self::$env['base_uri'] = 'https://' . $opt['host'];
+	}
 
+	public static function fromToken($token) {
+		self::setClient(new ApiClient([
+			'base_uri' => self::$env['base_uri'],
+			'headers' => ['Authorization' => 'Bearer '.$token]
+		]));
+		return self::getClient();
+	}
+
+	public static function fromLogin($username, $password) {
+		$client = new ApiClient([
+			'base_uri' => self::$env['base_uri']
+		]);
+
+		try {
+			$res = $client->post('/v1/token', array(
+				'json' => array(
+					'username' => $username,
+					'password' => $password
+				)
+			));
+
+			$token = json_decode($res->getBody()->getContents(), true);
+
+			return self::fromToken($token);
+	
+		} catch (RequestException $e) {
+		    if ($e->hasResponse()) {
+		        return $e->getResponse();
+		    }
+		}
+	}
+
+	public static function fromJWTMiddleware($username, $password) {
 		//Create your auth strategy
 		$authStrategy = new JsonAuthStrategy(
 		    [
@@ -35,10 +73,9 @@ class ApiClient extends Client {
 		        'json_fields' => ['username', 'password'],
 		    ]
 		);
-		$baseUri = 'https://api-dev.zephir.pro';
 
 		// Create authClient
-		$authClient = new Client(['base_uri' => $baseUri]);
+		$authClient = new Client(['base_uri' => self::$env['base_uri']]);
 
 		//Create the JwtManager
 		$jwtManager = new JwtManager(
@@ -57,47 +94,19 @@ class ApiClient extends Client {
 		// Add middleware
 		$stack->push(new JwtMiddleware($jwtManager));
 
-		parent::__construct([
+		self::setClient(new ApiClient([
 		    // Base URI is used with relative requests
-		    'base_uri' => 'https://api-dev.zephir.pro',
+		    'base_uri' => self::$env['base_uri'],
 		    // You can set any number of default request options.
 		    'timeout'  => 2.0,
 		    // Handlers
 			'handler' => $stack,
-		]);
+		]));
 
-		$this->user = array();
-		$this->rawToken = array();
-		$this->token = null;
-
-		self::$client = $this;
+		return self::getClient();
 	}
+}
 
-	public function login($username, $password) {
-		try {
-			$res = $this->post('/v1/token', array(
-				'json' => array(
-					'username' => $username,
-					'password' => $password
-				)
-			));
-			// echo json_encode($res->getBody()->getContents()); die();
-
-			$this->rawToken = json_decode($res->getBody()->getContents(), true);
-
-			// var_dump($this->rawToken); die();
-			$this->token = $this->rawToken['token'];
-
-			$data = $res;
-		} catch (RequestException $e) {
-		    // echo Psr7\str($e->getRequest());
-		    if ($e->hasResponse()) {
-		        // $data =  Psr7\str($e->getResponse());
-		        $data = $e->getResponse();
-		    }
-		    // die();
-		}
-		return $data;
-	}
+class ApiClient extends Client {
 
 }
