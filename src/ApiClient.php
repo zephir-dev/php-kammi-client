@@ -32,7 +32,7 @@ class ApiClient extends Client {
 
 	public function postInstanceParams($post) {
 		$data = array();
-		$data = json_decode($this->post('/v1/admin/instance/params', array('json' => $post)), true);
+		$data = json_decode($this->post('/v1/admin/instance/params', array('json' => $post))->getBody(), true);
 		$data = array_combine(array_column($data,'param'), array_column($data,'valeu'));	
 		return $data;
 	}
