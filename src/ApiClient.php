@@ -7,21 +7,26 @@ use GuzzleHttp\Client;
 
 class ApiClient extends Client {
 	
-	public function getInstanceParams($params) {
+	public function getInstanceParams($params = array()) {
+
+		$data = array();
 
 		if(is_array($params)) {
-			$res = json_decode(($this->get('/v1/admin/instance/params'))->getBody(), true);
+			$res = json_decode(($this->get('/v1/admin/instance/params'))->getBody(), true);	
 
-			$data = array_values(array_filter($res,function($v){
-				return in_array($v['param'],$res);
-			}));
-
-			$data = array_combine(array_column($data,'param'), array_column($data,'valeu'));	
+			if(count($params) === 0) {
+				$data = $res;
+			} else if (count($params) > 0) {
+				$data = array_values(array_filter($res,function($v) use($params) {
+					return in_array($v['param'],$params);
+				}));
+			} 
 		} else {
-			$res = json_decode(($this->get('/v1/admin/instance/params&name='.$params))->getBody(), true);
-			$data = array($res[0]['param'] => $res[0]['valeu']);
+			$res = json_decode(($this->get('/v1/admin/instance/params?name='.$params))->getBody(), true);	
+			$data = $res;
 		}
 
+		$data = array_combine(array_column($data,'param'), array_column($data,'valeu'));	
 		return $data;
 	}
 }

@@ -20,28 +20,12 @@ $data = array();
 ApiClientFactory::init();
 
 // This returns an authenticated client with token header prepared
-$c1 = ApiClientFactory::fromLogin('username', 'password');
+$c = ApiClientFactory::fromLogin('damien.parbhakar', 'zephir');
 
-// If you already got your token, use this one
-$c2 = ApiClientFactory::fromToken(ApiClientFactory::$token);
+$data = $c->getInstanceParams();
 
-// After one of those requests has been done, you can access token with 
-$token = ApiClientFactory::$token;
-
-// (Beta) This one will automagically request a new token if it's expired
-// Warning : It doesn't store the token in ApiClientFactory::$token, but it keeps it internally
-$c3 = ApiClientFactory::fromJWTMiddleware('username', 'password');
-
-// Example requests
-$r1 = json_decode($c1->get('/v1/users')->getBody(), true);
-$r2 = json_decode($c2->get('/v1/users')->getBody(), true);
-$r3 = json_decode($c3->get('/v1/users')->getBody(), true);
-
+// var_dump($data);
 // Returning data
-echo json_encode(array(
-	'c1' => $r1,
-	'c2' => $r2,
-	'c3' => $r3,
-));
+echo json_encode($data);
 
 die();
