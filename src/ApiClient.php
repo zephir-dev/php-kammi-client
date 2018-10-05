@@ -12,8 +12,8 @@ class ApiClient extends Client {
 		if(is_array($params)) {
 			$res = json_decode(($this->get('/v1/admin/instance/params'))->getBody(), true);
 
-			$data = array_values(array_filter($params,function($v){
-				return in_array($v['param'],$params);
+			$data = array_values(array_filter($res,function($v){
+				return in_array($v['param'],$res);
 			}));
 
 			$data = array_combine(array_column($data,'param'), array_column($data,'valeu'));	
