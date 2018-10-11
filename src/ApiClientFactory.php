@@ -35,7 +35,10 @@ class ApiClientFactory {
 	public static function fromToken($token) {
 		self::setClient(new ApiClient([
 			'base_uri' => self::$env['base_uri'],
-			'headers' => ['Authorization' => 'Bearer '.$token]
+			'headers' => [
+				'Authorization' => 'Bearer '.$token,
+				'X-Client-Url' => explode('.',$_SERVER['SERVER_NAME'])[0],
+			]
 		]));
 		self::$token = $token;
 		return self::getClient();
@@ -57,7 +60,7 @@ class ApiClientFactory {
 			$token = json_decode($res->getBody()->getContents(), true);
 
 			return self::fromToken($token['token']);
-	
+
 		} catch (RequestException $e) {
 		    if ($e->hasResponse()) {
 		        return $e->getResponse();
