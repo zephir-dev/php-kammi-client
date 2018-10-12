@@ -23,7 +23,7 @@ class ApiClient extends Client {
 		$data = array();
 
 		if(is_array($params)) {
-			$res = json_decode(($this->get('/v1/admin/instance/params'))->getBody(), true);
+			$res = json_decode($this->get('/v1/admin/instance/params')->getBody()->getContents(), true);
 
 			if(count($params) === 0) {
 				$data = $res;
@@ -33,7 +33,7 @@ class ApiClient extends Client {
 				}));
 			}
 		} else {
-			$res = json_decode(($this->get('/v1/admin/instance/params?name='.$params))->getBody(), true);
+			$res = json_decode($this->get('/v1/admin/instance/params?name='.$params)->getBody()->getContents(), true);
 			$data = $res;
 		}
 
@@ -43,7 +43,7 @@ class ApiClient extends Client {
 
 	public function postInstanceParams($post) {
 		$data = array();
-		$data = json_decode($this->post('/v1/admin/instance/params', array('json' => $post))->getBody(), true);
+		$data = json_decode($this->post('/v1/admin/instance/params', array('json' => $post))->getBody()->getContents(), true);
 		$data = array_combine(array_column($data,'param'), array_column($data,'valeu'));
 		return $data;
 	}
