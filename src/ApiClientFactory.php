@@ -28,8 +28,13 @@ class ApiClientFactory {
 			self::$env['host'] = 'api-dev.zephir.pro';
 			self::$env['X-Client-Url'] = 'z-dev.zephir.pro';
 		} else {
-			self::$env['host'] = $opt['host'];
-			self::$env['X-Client-Url'] = $opt['X-Client-Url'];
+			if(isset($opt['host'])) {
+				self::$env['host'] = $opt['host'];
+			}
+
+			if(isset($opt['X-Client-Url'])) {
+				self::$env['X-Client-Url'] = $opt['X-Client-Url'];
+			}
 		}
 		self::$env['base_uri'] = 'https://' . self::$env['host'];
 	}
