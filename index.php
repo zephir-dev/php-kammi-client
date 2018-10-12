@@ -22,10 +22,11 @@ ApiClientFactory::init();
 // This returns an authenticated client with token header prepared
 $c = ApiClientFactory::fromLogin('damien.parbhakar', 'zephir');
 
-$data = $c->getInstanceParams();
+// $data = $c->getInstanceParams();
+$data = $c->get('/v1/admin/instance/params')->getBody()->getContents();
 
-// var_dump($data);
+var_dump($data);
 // Returning data
-echo json_encode($data);
+// echo json_encode($data);
 
 die();

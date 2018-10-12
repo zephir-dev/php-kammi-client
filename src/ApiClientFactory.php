@@ -26,8 +26,10 @@ class ApiClientFactory {
 	public static function init($opt = null) {
 		if($opt == null) {
 			self::$env['host'] = 'api-dev.zephir.pro';
+			self::$env['X-Client-Url'] = 'z-dev.zephir.pro';
 		} else {
 			self::$env['host'] = $opt['host'];
+			self::$env['X-Client-Url'] = $opt['X-Client-Url'];
 		}
 		self::$env['base_uri'] = 'https://' . self::$env['host'];
 	}
@@ -37,7 +39,7 @@ class ApiClientFactory {
 			'base_uri' => self::$env['base_uri'],
 			'headers' => [
 				'Authorization' => 'Bearer '.$token,
-				'X-Client-Url' => explode('.',$_SERVER['SERVER_NAME'])[0],
+				'X-Client-Url' => self::$env['X-Client-Url'],
 			]
 		]));
 		self::$token = $token;
@@ -46,7 +48,10 @@ class ApiClientFactory {
 
 	public static function fromLogin($username, $password) {
 		$client = new ApiClient([
-			'base_uri' => self::$env['base_uri']
+			'base_uri' => self::$env['base_uri'],
+			'headers' => [
+				'X-Client-Url' => self::$env['X-Client-Url'],
+			]
 		]);
 
 		try {
