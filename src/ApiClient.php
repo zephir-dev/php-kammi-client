@@ -48,4 +48,10 @@ class ApiClient extends Client {
 		return $data;
 	}
 
+	public function getIndemnityTypes()
+	{
+		$data = $this->get('/v1/indemnities/types')->getBody()->getContents();
+		return $data;
+	}
+
 }
