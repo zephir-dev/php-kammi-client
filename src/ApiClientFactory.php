@@ -24,9 +24,15 @@ class ApiClientFactory {
 	}
 
 	public static function init($opt = null) {
+		$scheme = 'https';
 		self::$env['host'] = $opt['host'] ?? 'api-dev.zephir.pro';
+
+		if(self::$env['host'] == 'localhost') {
+			$scheme = 'http';
+		}
+
 		self::$env['X-Client-Url'] = $opt['X-Client-Url'] ?? 'z-dev.zephir.pro';
-		self::$env['base_uri'] = 'https://' . self::$env['host'];
+		self::$env['base_uri'] =  $scheme.'://' . self::$env['host'];
 	}
 
 	public static function fromToken($token) {

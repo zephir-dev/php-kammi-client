@@ -17,7 +17,7 @@ require_once('./vendor/autoload.php');
 $data = array();
 
 // Fatal error if no init. Defaults on dev api server.
-ApiClientFactory::init();
+ApiClientFactory::init(['host' => 'localhost']);
 
 // This returns an authenticated client with token header prepared
 $c = ApiClientFactory::fromLogin('damien.parbhakar', 'zephir');
