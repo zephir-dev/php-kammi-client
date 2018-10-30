@@ -75,7 +75,7 @@ $data = array();
 // Plante si pas initialisé. Sans paramètres, tape par défaut sur le couple api-dev/z-dev
 ApiClientFactory::init([
 	'host' => 'localhost',
-	'X-Client-Url' => 'api-dev.zephir.pro'
+	'X-Client-Url' => 'z-dev.zephir.pro'
 ]);
 
 // Renvoie un client
