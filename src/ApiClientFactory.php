@@ -32,7 +32,13 @@ class ApiClientFactory {
 		}
 
 		self::$env['X-Client-Url'] = $opt['X-Client-Url'] ?? 'z-dev.zephir.pro';
-		self::$env['base_uri'] =  $scheme.'://' . self::$env['host'];
+        
+		if( strstr(self::$env['host'], '://') !== false ){
+		    self::$env['base_uri'] =  self::$env['host'];
+		}
+		else {
+			self::$env['base_uri'] =  $scheme.'://' . self::$env['host'];
+		}
 	}
 
 	public static function fromToken($token) {
