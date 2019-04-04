@@ -6,7 +6,10 @@ use GuzzleHttp\Client;
 
 
 class ApiClient extends Client {
-
+	
+        protected $apiResult;
+        protected $apiParams;
+	
 	public function __construct($options) {
 		parent::__construct($options);
 
@@ -48,24 +51,31 @@ class ApiClient extends Client {
 		return $data;
 	}
 	
-    public function sendToApi( $method, $url )
+    public function sendToApi( $method, $url, $params=array() )
     {
-        $this->result       = $this->request($method, $url )->getBody()->getContents();
-        $jsonDecodedResult  = json_decode($this->result, true);
+        $this->apiParams    = $params;
+        
+        $formattedFormParams = [];
+        if( !empty($this->apiParams) ){
+            $formattedFormParams = [ 'form_params' => $this->apiParams ];
+        }
+        
+        $this->apiResult    = $this->request($method, $url, $formattedFormParams)->getBody()->getContents();
+        $jsonDecodedResult  = json_decode($this->apiResult, true);
         
         if( !empty($jsonDecodedResult) ){
             return $jsonDecodedResult;
         }
         
-        if(strstr($this->result, 'xdebug') )
+        if(strstr($this->apiResult, 'xdebug') )
         {
-            $position = strpos($this->result, '<br />');
+            $position = strpos($this->apiResult, '<br />');
             
-            echo substr($this->result, $position);
+            echo substr($this->apiResult, $position);
             
-            $this->result = trim( substr($this->result, 0, $position) );
+            $this->apiResult = trim( substr($this->apiResult, 0, $position) );
             
-            return json_decode( trim(substr($this->result, 0, $position)), true);
+            return json_decode( trim(substr($this->apiResult, 0, $position)), true);
         }
         
         return false;
@@ -74,7 +84,7 @@ class ApiClient extends Client {
     public function debugResult()
     {
         // DEBUG
-        foreach( json_decode($this->result, true) as $resultCat => $resultContent )
+        foreach( json_decode($this->apiResult, true) as $resultCat => $resultContent )
         {
             echo "<div onclick=\"$('#".$resultCat."-debug').toggle();\">".$resultCat."</div>";
             echo "<pre id=\"".$resultCat."-debug\" style=\"display: none;\">";
@@ -83,6 +93,10 @@ class ApiClient extends Client {
         }
         
         return;
-    }	
-
+    }
+    
+    public function getApiParams()
+    {
+        return $this->apiParams;
+    }
 }
