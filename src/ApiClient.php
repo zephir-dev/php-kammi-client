@@ -47,5 +47,42 @@ class ApiClient extends Client {
 		$data = array_combine(array_column($data,'param'), array_column($data,'valeu'));
 		return $data;
 	}
+	
+    public function sendToApi( $method, $url )
+    {
+        $this->result       = $this->request($method, $url )->getBody()->getContents();
+        $jsonDecodedResult  = json_decode($this->result, true);
+        
+        if( !empty($jsonDecodedResult) ){
+            return $jsonDecodedResult;
+        }
+        
+        if(strstr($this->result, 'xdebug') )
+        {
+            $position = strpos($this->result, '<br />');
+            
+            echo substr($this->result, $position);
+            
+            $this->result = trim( substr($this->result, 0, $position) );
+            
+            return json_decode( trim(substr($this->result, 0, $position)), true);
+        }
+        
+        return false;
+    }
+    
+    public function debugResult()
+    {
+        // DEBUG
+        foreach( json_decode($this->result, true) as $resultCat => $resultContent )
+        {
+            echo "<div onclick=\"$('#".$resultCat."-debug').toggle();\">".$resultCat."</div>";
+            echo "<pre id=\"".$resultCat."-debug\" style=\"display: none;\">";
+            var_dump($resultContent);
+            echo "</pre>";
+        }
+        
+        return;
+    }	
 
 }
