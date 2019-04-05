@@ -83,8 +83,13 @@ class ApiClient extends Client {
     
     public function debugResult()
     {
-        // DEBUG
-        foreach( json_decode($this->apiResult, true) as $resultCat => $resultContent )
+        $result = json_decode($this->apiResult, true); 
+        
+        if( $raw === false && !empty($result['data']) ){
+            $result = $result['data'];
+        }
+        
+        foreach( $result as $resultCat => $resultContent )
         {
             echo "<div onclick=\"$('#".$resultCat."-debug').toggle();\">".$resultCat."</div>";
             echo "<pre id=\"".$resultCat."-debug\" style=\"display: none;\">";
