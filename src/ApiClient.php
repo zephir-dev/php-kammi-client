@@ -81,7 +81,7 @@ class ApiClient extends Client {
         return false;
     }
     
-    public function debugResult()
+    public function debugResult( $raw=false )
     {
         $result = json_decode($this->apiResult, true); 
         
