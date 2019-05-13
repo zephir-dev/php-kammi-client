@@ -14,6 +14,7 @@ class ApiClientFactory {
 	public static $env;
 	public static $client;
 	public static $token;
+	public static $user;
 
 	public static function getClient() {
 		return self::$client;
@@ -79,6 +80,36 @@ class ApiClientFactory {
 		    }
 		}
 	}
+        
+	public static function fromGoogleToken( $googleToken )
+        {
+                $client = new ApiClient([
+                        'base_uri' => self::$env['base_uri'],
+			'headers' => [
+				'X-Client-Url' => self::$env['X-Client-Url'],
+			]
+		]);
+                
+		try {
+                        $res    = $client->post( '/v1/token/google/'. urlencode($googleToken) );
+                        $token  = json_decode($res->getBody()->getContents(), true);
+                        
+                        if( !empty($token['user']) ){
+                                self::$user = $token['user'];
+                        }
+            
+			return self::fromToken($token['token']);
+		} 
+                catch( RequestException $e ) 
+                {
+                        if( $e->hasResponse() ){
+                                return $e->getResponse();
+                        }
+		}
+	}
+
+        
+        
 
 	public static function fromJWTMiddleware($username, $password) {
 		//Create your auth strategy
