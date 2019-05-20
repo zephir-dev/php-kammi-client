@@ -15,6 +15,7 @@ class ApiClientFactory {
 	public static $client;
 	public static $token;
 	public static $user;
+	public static $data;
 
 	public static function getClient() {
 		return self::$client;
@@ -54,7 +55,7 @@ class ApiClientFactory {
 		return self::getClient();
 	}
 
-	public static function fromLogin($username, $password) {
+	public static function fromLogin( $username, $password, $params=false ){
 		$client = new ApiClient([
 			'base_uri' => self::$env['base_uri'],
 			'headers' => [
@@ -63,48 +64,77 @@ class ApiClientFactory {
 		]);
 
 		try {
-			$res = $client->post('/v1/token', array(
-				'json' => array(
-					'username' => $username,
-					'password' => $password
-				)
-			));
+			$resContent = $client->sendToApi( 'post', '/v1/token', [
+                'username' => $username,
+                'password' => $password,
+                'params'   => $params, 
+            ]);
+            
+            if( !empty($resContent['user']) ){
+                self::$user = $resContent['user'];
+            }
+            
+            
+            self::$data = $resContent;
+            
+            
+			return self::fromToken($resContent['token']);
 
-			$token = json_decode($res->getBody()->getContents(), true);
-
-			return self::fromToken($token['token']);
-
-		} catch (RequestException $e) {
+		} catch( RequestException $e ){
 		    if ($e->hasResponse()) {
 		        return $e->getResponse();
 		    }
 		}
 	}
-        
-	public static function fromGoogleToken( $googleToken )
-        {
-                $client = new ApiClient([
-                        'base_uri' => self::$env['base_uri'],
+    
+	public static function fromGoogleToken( $googleToken, $params=false )
+    {
+        $client = new ApiClient([
+            'base_uri' => self::$env['base_uri'],
 			'headers' => [
 				'X-Client-Url' => self::$env['X-Client-Url'],
 			]
 		]);
-                
+        
 		try {
-                        $res    = $client->post( '/v1/token/google/'. urlencode($googleToken) );
-                        $token  = json_decode($res->getBody()->getContents(), true);
-                        
-                        if( !empty($token['user']) ){
-                                self::$user = $token['user'];
-                        }
+            $resContent = $client->sendToApi( 'post', '/v1/token/google/'. urlencode($googleToken), $params );
             
-			return self::fromToken($token['token']);
+            if( !empty($resContent['user']) ){
+                self::$user = $resContent['user'];
+            }
+            
+            self::$data = $resContent;
+            
+			return self::fromToken($resContent['token']);
 		} 
-                catch( RequestException $e ) 
-                {
-                        if( $e->hasResponse() ){
-                                return $e->getResponse();
-                        }
+        catch( RequestException $e ) 
+        {
+            if( $e->hasResponse() ){
+                return $e->getResponse();
+            }
+		}
+	}
+
+	public static function loginFormData()
+    {
+        $client = new ApiClient([
+            'base_uri' => self::$env['base_uri'],
+			'headers' => [
+				'X-Client-Url' => self::$env['X-Client-Url'],
+			]
+		]);
+        
+		try {
+            $res    = $client->get( '/v1/token/login/data' );
+            $data   = json_decode($res->getBody()->getContents(), true);
+            
+			return $data;
+		} 
+        catch( RequestException $e ) 
+        {
+            if( $e->hasResponse() ){
+                return $e->getResponse();
+            }
 		}
 	}
 
