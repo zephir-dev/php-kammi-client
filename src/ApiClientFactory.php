@@ -159,7 +159,11 @@ class ApiClientFactory {
             ]
         ]);
         
-        try {
+        try
+        {
+            $params = [
+                'token' => self::$token
+            ];
             $res    = $client->get( '/v1/token/login/data' );
             $data   = json_decode($res->getBody()->getContents(), true);
             
@@ -217,4 +221,34 @@ class ApiClientFactory {
 
         return self::getClient();
     }
+
+    //cette fonction permet d'envoyer un mail de réinitialisation de mot de passe même si l'utilisateur n'est pas connecté
+    //elle prend en paramètre le nom d'utilisateur ex: "user@domaine.com"
+    public static function sendForgotPasswordMail($username)
+    {
+        $client = new ApiClient([
+            'base_uri' => self::$env['base_uri'],
+            'headers' => [
+                'X-Client-Url' => self::$env['X-Client-Url'],
+            ]
+        ]);
+        
+        try {
+
+            $params = [
+                'username' => $username
+            ];
+			
+            $res = $client->sendToApi( 'post', '/v1/token/login/forgot-password', $params );
+            
+            return $res;
+        } 
+        catch( RequestException $e ) 
+        {
+            if( $e->hasResponse() ){
+                return $e->getResponse();
+            }
+        }
+    }
+
 }
