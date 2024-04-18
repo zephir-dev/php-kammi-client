@@ -251,4 +251,28 @@ class ApiClientFactory {
         }
     }
 
+    //cette fonction permet d'envoyer un mail contenant des données oubliées par l'utilisateur
+    //elle prend en paramètre l'adresse mail de l'utilisateur et les données voulu dans le mail
+    public static function sendForgotDataMail($params)
+    {
+        $client = new ApiClient([
+            'base_uri' => self::$env['base_uri'],
+            'headers' => [
+                'X-Client-Url' => self::$env['X-Client-Url'],
+            ]
+        ]);
+        
+        try {
+            $res = $client->sendToApi( 'post', '/v1/token/login/forgot-data', $params );
+            
+            return $res;
+        } 
+        catch( RequestException $e ) 
+        {
+            if( $e->hasResponse() ){
+                return $e->getResponse();
+            }
+        }
+    }
+    
 }
