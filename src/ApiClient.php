@@ -3,7 +3,7 @@
 namespace KammiApiClient;
 
 use GuzzleHttp\Client;
-
+use GuzzleHttp\HandlerStack;
 
 class ApiClient extends Client {
 	
@@ -11,7 +11,12 @@ class ApiClient extends Client {
         protected $apiParams;
 	
 	public function __construct($options) {
-		parent::__construct($options);
+        if (isset($GLOBALS['profiler'])) {
+            $stack = HandlerStack::create();
+            $stack->push(new LoggingMiddleware($GLOBALS['profiler']), 'logger');
+            $options['handler'] = $stack;
+        }
+        parent::__construct($options);
 
 		// $res = json_decode(($this->post('/v1/token/validate'))->getBody(), true);
 		// if(!empty($res['user']) && $res['user']['matri'] > 0) {
@@ -59,10 +64,10 @@ class ApiClient extends Client {
         if( !empty($this->apiParams) ){
             $formattedFormParams = [ 'form_params' => $this->apiParams ];
         }
-        
+
         $this->apiResult    = $this->request($method, $url, $formattedFormParams)->getBody()->getContents();
         $jsonDecodedResult  = json_decode($this->apiResult, true);
-        
+
         if( !empty($jsonDecodedResult) ){
             return $jsonDecodedResult;
         }
