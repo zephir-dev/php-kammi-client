@@ -2,6 +2,7 @@
 
 namespace KammiApiClient;
 
+use GuzzleHttp\Psr7\Query;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\RequestInterface;
 use ZephirV2\Profiler\Profiler;
@@ -29,7 +30,7 @@ class LoggingMiddleware
 
             $body = $request->getBody();
             if ($body->isSeekable()) $body->rewind();
-            $log['request']['body'] = $body->getContents();
+            $log['request']['body'] = json_encode(Query::parse($body->getContents()), true);
 
             /** @var PromiseInterface $promise */
             $promise = $handler($request, $options);
