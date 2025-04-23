@@ -30,7 +30,8 @@ class LoggingMiddleware
 
             $body = $request->getBody();
             if ($body->isSeekable()) $body->rewind();
-            $log['request']['body'] = json_encode(Query::parse($body->getContents()), true);
+            $log['request']['body'] = $body->getContents();
+            $log['request']['jsonBody'] = json_encode(Query::parse($log['request']['body']), true);
 
             /** @var PromiseInterface $promise */
             $promise = $handler($request, $options);
