@@ -89,7 +89,7 @@ class LoggingMiddleware
         return array_map(fn(array $v) => implode(', ', $v), $headers);
     }
 
-    private function errorMessage(mixed $e): string
+    private function errorMessage($e): string
     {
         if ($e instanceof RequestException) {
             $msg = sprintf(
@@ -120,7 +120,7 @@ class LoggingMiddleware
         return 'Unknown error';
     }
 
-    private function decodeJson(string $s): mixed
+    private function decodeJson(string $s)
     {
         $decoded = json_decode($s);
         return json_last_error() === JSON_ERROR_NONE ? $decoded : $s;
