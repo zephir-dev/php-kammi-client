@@ -56,18 +56,13 @@ class ApiClient extends Client {
 		return $data;
 	}
 	
-    public function sendToApi( $method, $url, $params=array(), $timeout = null )
+    public function sendToApi( $method, $url, $params=array() )
     {
         $this->apiParams    = $params;
         
         $formattedFormParams = [];
         if( !empty($this->apiParams) ){
             $formattedFormParams = [ 'form_params' => $this->apiParams ];
-        }
-
-        if ($timeout !== null)
-        {
-            $formattedFormParams['timeout'] = $timeout;
         }
 
         $this->apiResult    = $this->request($method, $url, $formattedFormParams)->getBody()->getContents();
