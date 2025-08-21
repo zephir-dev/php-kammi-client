@@ -15,6 +15,7 @@ class ApiClient extends Client {
             $stack = HandlerStack::create();
             $stack->push(new LoggingMiddleware($GLOBALS['profiler']), 'logger');
             $options['handler'] = $stack;
+            $GLOBALS['guzzle_stack'] = $stack; //permet de logger les appels à l'api google
         }
         parent::__construct($options);
 
