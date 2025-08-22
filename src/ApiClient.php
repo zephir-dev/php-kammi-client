@@ -3,7 +3,6 @@
 namespace KammiApiClient;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\HandlerStack;
 
 class ApiClient extends Client {
 	
@@ -11,11 +10,8 @@ class ApiClient extends Client {
         protected $apiParams;
 	
 	public function __construct($options) {
-        if (isset($GLOBALS['profiler'])) {
-            $stack = HandlerStack::create();
-            $stack->push(new LoggingMiddleware($GLOBALS['profiler']), 'logger');
-            $options['handler'] = $stack;
-            $GLOBALS['guzzle_stack'] = $stack; //permet de logger les appels à l'api google
+        if (isset($GLOBALS['profiler']) && function_exists("getGuzzleStack")) {
+            $options['handler'] = getGuzzleStack();
         }
         parent::__construct($options);
 
